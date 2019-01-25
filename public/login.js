@@ -1,12 +1,11 @@
-const addUser = function(){
+const verifyUser = function(){
   const form = document.getElementById('form');
-  let properties = ['name','id','password'];
+  let properties = ['id','password'];
   if(isInvalid(properties,form)){
-    console.log('inValid');
     return ;
   }
   let details = getFormData(properties,form);
-  fetch('/upload',{
+  fetch('/login',{
     method:'POST',
     body: JSON.stringify(details)
   }).then(res => {
@@ -17,8 +16,10 @@ const addUser = function(){
       form.id.value = "";
       return ;
     }
-    form.reset();
-    document.getElementById('error').style.visibility = 'hidden';
-    return ;
+    form.onsubmit = null;
+    form.method = "POST";
+    form.action = "/getCookie";
+    form.submit();
+    return;
   })
 }

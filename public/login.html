@@ -1,28 +1,23 @@
 <html>
 
 <head>
-  <title>new Account</title>
+  <title>TODO: Login</title>
   <link rel="stylesheet" href="/style.css" />
-  <script src="main.js"></script>
-  <script src="utils.js"></script>
+  <script src="/login.js"></script>
+  <script src="/utils.js"></script>
 </head>
 
 <body>
   <div class="main">
     <header>
-      <h1>Create New Account</h1>
+      <h1>Login</h1>
     </header>
     <div class="form">
       <form id="form" onsubmit="return false;">
         <table>
           <tr>
             <td>UserId:</td>
-            <td><input type="text" name="id" required /></td>
-
-          </tr>
-          <tr>
-            <td>Name:</td>
-            <td><input name="name" required /></td>
+            <td><input name="id" required /></td>
           </tr>
           <tr>
             <td>Password:</td>
@@ -30,15 +25,15 @@
           </tr>
           <tr>
             <td colspan="2" style="text-align: center">
-              <button onclick="addUser()">Create Account</button>
+              <button type="submit" onclick="verifyUser()">login</button>
               <input type="reset" />
             </td>
           </tr>
         </table>
       </form>
-      <p id="error" style="visibility: hidden">sorry already existing user id</p>
+      <p id="error" style="visibility: hidden">Invalid userId or password</p>
       <div style="text-align: center;">
-        <a href="/" style="font-size: 15px;">Click here to login</a>
+        <a href="/newAccount.html" style="font-size: 15px;">Create Account</a>
       </div>
     </div>
   </div>

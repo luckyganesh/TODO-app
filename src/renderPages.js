@@ -11,19 +11,19 @@ const renderFiles = function (fs, req, res) {
   })
 }
 
-const loginHandler = function(fs,cookies,req, res) {
-  let date = new Date().getTime();
-  cookies.push(date);
-  res.setHeader("Set-Cookie", `id=${date}`);
-  res.writeHead(302, {
-    Location: '/'
-  });
+const loginHandler = function (fs, cookies, allusers, req, res) {
+  const { id, password } = JSON.parse(req.body);
+  if (allusers.validateUser(id,password)) {
+    res.write(JSON.stringify({ status: 1 }))
+    res.end();
+    return ;
+  }
+  res.write(JSON.stringify({ status: 0 }))
   res.end();
-  fs.writeFile('./src/cookies.json',JSON.stringify(cookies),(err) => console.log(err));
 };
 
 const renderLoginPage = function (fs, req, res) {
-  fs.readFile('./public/index.html', (err, content) => {
+  fs.readFile('./public/login.html', (err, content) => {
     if (err) {
       sendNotFound(req, res);
       return;
@@ -33,17 +33,16 @@ const renderLoginPage = function (fs, req, res) {
 }
 
 const renderHomePage = function (fs, cookies, req, res) {
-  console.log(cookies);
   const id = +req.cookies.id;
   if (id) {
-    if (cookies.includes(id)) {
+    if (cookies.isPresent(id)) {
       console.log(id);
       console.log('it came');
       res.end();
       return;
     }
   }
-  res.writeHead(302,{
+  res.writeHead(302, {
     Location: '/login'
   });
   res.end();

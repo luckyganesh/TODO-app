@@ -29,6 +29,9 @@ class AllUsersDetail {
   isAlreadyPresent(userId) {
     return this.users.some(isSameUser.bind(null,userId));
   }
+  validateUser(userId,password){
+    return this.users.some(user => user.isSameUser(userId,password));
+  }
 }
 
 module.exports = {
