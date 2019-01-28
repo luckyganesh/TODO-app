@@ -6,6 +6,9 @@ class Cookie {
   isSame(id){
     return this.id == id
   }
+  isSameCookie(id,userId){
+    return this.id == id && this.userId == userId;
+  }
 }
 
 const deleteElement = function(list,index){
@@ -22,8 +25,14 @@ class Cookies {
   addCookie(cookie){
     this.cookies.push(cookie);
   }
-  isPresent(id){
+  isPresent(id,userId){
+    return this.cookies.some(cookie => cookie.isSameCookie(id,userId));
+  }
+  isIdPresent(id){
     return this.cookies.some(cookie => cookie.isSame(id));
+  }
+  giveMeUser(id){
+    return this.cookies.find(cookie => cookie.isSame(id));
   }
   deleteCookie(cookieId){
     let index = this.cookies.findIndex(cookie => cookie.isSame(cookieId));

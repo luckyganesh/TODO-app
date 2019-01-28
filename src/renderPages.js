@@ -35,9 +35,11 @@ const renderLoginPage = function (fs, req, res) {
 const renderHomePage = function (fs, cookies, req, res) {
   const id = +req.cookies.id;
   if (id) {
-    if (cookies.isPresent(id)) {
-      console.log(id);
-      console.log('it came');
+    if (cookies.isIdPresent(id)) {
+      let userId = cookies.giveMeUser(id).userId;
+      res.writeHead(302,{
+        Location:'/'+userId
+      })
       res.end();
       return;
     }
