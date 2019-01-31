@@ -1,3 +1,5 @@
+const { placeInObject } = require('./utils.js');
+
 const readBody = function (req, res, next) {
   let content = "";
   req.on('data', chunk => {
@@ -21,7 +23,13 @@ const readCookies = function (req, res, next) {
   next();
 };
 
+
+const readArgs = content => {
+  return content.split('&').reduce(placeInObject, {});
+};
+
 module.exports = {
   readBody,
-  readCookies
+  readCookies,
+  readArgs
 }

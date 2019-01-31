@@ -24,17 +24,6 @@ const renderFiles = function (fs, req, res) {
   })
 }
 
-const loginHandler = function (allusers, req, res) {
-  const { id, password } = JSON.parse(req.body);
-  if (allusers.validateUser(id, password)) {
-    res.write(JSON.stringify({ status: 1 }))
-    res.end();
-    return;
-  }
-  res.write(JSON.stringify({ status: 0 }))
-  res.end();
-};
-
 const renderLoginPage = function (fs, cookies, req, res) {
   const id = +req.cookies.id;
   if (id && cookies.isIdPresent(id)) {
@@ -72,6 +61,5 @@ const renderHomePage = function (cookies, req, res) {
 module.exports = {
   renderHomePage,
   renderLoginPage,
-  renderFiles,
-  loginHandler
+  renderFiles
 }

@@ -6,8 +6,8 @@ const { UTILS, SEND_HANDLER, RENDER_PAGES, READ_OPTIONS, EXPRESS,
 
 const { logRequest } = require(UTILS);
 const { sendNotFound } = require(SEND_HANDLER);
-const { renderHomePage, renderFiles, loginHandler, renderLoginPage } = require(RENDER_PAGES);
-const { readBody, readCookies } = require(READ_OPTIONS);
+const { renderHomePage, renderFiles, renderLoginPage } = require(RENDER_PAGES);
+const { readBody, readCookies, readArgs } = require(READ_OPTIONS);
 
 const { Express } = require(EXPRESS);
 const todoApp = require('./todoApp.js');
@@ -72,6 +72,7 @@ const readCookiesFile = function () {
     cookies.addCookie(cookie);
   })
 }
+
 readCookiesFile();
 
 readUsers();
@@ -97,18 +98,6 @@ const createUserHandler = function (req, res) {
   })
 }
 
-const splitKeyValue = pair => pair.split('=');
-
-const placeInObject = function (object, keyValuePair) {
-  let [key, value] = splitKeyValue(keyValuePair);
-  object[key] = value;
-  return object;
-}
-
-const readArgs = content => {
-  return content.split('&').reduce(placeInObject, {});
-};
-
 const updateCookies = function () {
   fs.writeFile(COOKIES_FILE, JSON.stringify(cookies.getCookies()), (err) => {
     if (err) {
@@ -117,7 +106,7 @@ const updateCookies = function () {
   })
 }
 
-const renderLoggedin = function (req, res) {
+const provideCookie = function (req, res) {
   let { id } = readArgs(req.body);
   let cookieId = new Date().getTime();
   let cookie = new Cookie({ id: cookieId, userId: id });
@@ -129,6 +118,17 @@ const renderLoggedin = function (req, res) {
   })
   res.end();
 }
+
+const loginHandler = function (allusers, req, res) {
+  const { id, password } = JSON.parse(req.body);
+  if (allusers.validateUser(id, password)) {
+    res.write(JSON.stringify({ status: 1 }))
+    res.end();
+    return;
+  }
+  res.write(JSON.stringify({ status: 0 }))
+  res.end();
+};
 
 const userHandler = function (req, res, next) {
   let cookie = req.cookies;
@@ -156,11 +156,11 @@ app.use(logRequest);
 app.use(readBody);
 app.use(readCookies);
 app.use(userHandler);
-app.post('/getCookie', renderLoggedin)
+app.post('/getCookie', provideCookie)
 app.post('/login', loginHandler.bind(null, allUsersDetails));
 app.get('/login', renderLoginPage.bind(null, fs, cookies));
 app.get('/', renderHomePage.bind(null, cookies));
-app.post('/upload', createUserHandler);
+app.post('/createNewUser', createUserHandler);
 app.get('/logout', logoutHandler);
 app.use(renderFiles.bind(null, fs));
 app.use(sendNotFound);
