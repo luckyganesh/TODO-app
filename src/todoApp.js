@@ -53,11 +53,14 @@ const deleteTodo = function (req, res) {
   res.end();
 }
 
-const addTodo = function (req, res) {
-  const todoDetails = JSON.parse(req.body);
+const createNewTodo = function (todoDetails) {
   const items = new Items();
   todoDetails.id = Date.now();
-  const todo = new Todo(todoDetails, items);
+  return new Todo(todoDetails, items);
+}
+const addTodo = function (req, res) {
+  const todoDetails = JSON.parse(req.body);
+  const todo = createNewTodo(todoDetails);
   req.user.addTodo(todo);
   updateTodoAndEndRes(res, req.user, todoDetails.id);
   return;
@@ -68,15 +71,20 @@ const todoPage = function (userId, todoId) {
   return page.replace('##userId##', userId);
 }
 
+const isValidTodo = function (user, todoId) {
+  return +todoId && user.isTodoPresent(todoId)
+}
+
 const renderTodoDetail = function (req, res, next) {
   const todoId = req.url.slice(1);
-  if (+todoId && req.user.isTodoPresent(todoId)) {
-    const userId = req.user.details.id;
-    const content = todoPage(userId, todoId);
-    send(res, 200, content, 'text/html');
+  if (!isValidTodo(req.user, todoId)) {
+    next();
     return;
   }
-  next();
+  const userId = req.user.details.id;
+  const content = todoPage(userId, todoId);
+  send(res, 200, content, 'text/html');
+  return;
 }
 
 const sendTodoList = function (req, res) {
@@ -96,10 +104,6 @@ const createNewItem = function (itemContent) {
 
 const addItem = function (req, res) {
   const todoId = getTodoId(req.url);
-  if (!req.user.isTodoPresent(todoId)) {
-    sendNotFound(req, res);
-    return;
-  }
   const { itemContent } = JSON.parse(req.body);
   const item = createNewItem(itemContent);
   req.user.addItemToTodo(todoId, item);
@@ -109,10 +113,6 @@ const addItem = function (req, res) {
 
 const getItems = function (req, res) {
   const todoId = getTodoId(req.url);
-  if (!req.user.isTodoPresent(todoId)) {
-    sendNotFound(req, res);
-    return;
-  }
   const items = JSON.stringify(req.user.getItems(todoId));
   send(res, 200, items, 'application/json');
   return;
@@ -120,10 +120,6 @@ const getItems = function (req, res) {
 
 const getDetails = function (req, res) {
   const todoId = getTodoId(req.url);
-  if (!req.user.isTodoPresent(todoId)) {
-    sendNotFound(req, res);
-    return;
-  }
   const items = JSON.stringify(req.user.getTodoDetails(todoId));
   send(res, 200, items, 'application/json');
   return;
@@ -161,12 +157,21 @@ const modifyItemContent = function (req, res) {
   return;
 }
 
+const checkValidTodo = function (req, res, next) {
+  const todoId = getTodoId(req.url);
+  const isValid = isValidTodo(req.user, todoId);
+  const nextFunction = isValid ? next : sendNotFound;
+  nextFunction(req, res);
+  return;
+}
+
 app.use(renderTodoDetail);
 app.get('/', renderHomePage);
 app.post('/todos', sendTodos);
 app.post('/addTodo', addTodo);
 app.post('/deleteTodo', deleteTodo);
 app.post('/getTodo', sendTodoList);
+app.use(checkValidTodo);
 app.post(/\/.*\/getItems/, getItems);
 app.post(/\/.*\/getDetails /, getDetails);
 app.post(/\/.*\/addItem/, addItem);
