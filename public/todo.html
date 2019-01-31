@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script>
+    const userId = '##userId##'
+    const todoId = '##todoId##';
+  </script>
+  <script src="/header.js"></script>
+  <script src="/utils.js"></script>
+  <script src="/todo.js"></script>
+</head>
+
+<body>
+  <div id="header">
+  </div>
+  <hr>
+  <a href="/"><button>go back</button></a>
+  <main>
+    <div id="details">
+      <h3>TODO DETAILS</h3>
+      <p>
+        <label>Title:</label>
+        <input id="title">
+      </p>
+      <p>
+        <label>Description : </label>
+        <textarea id="description"></textarea>
+      </p>
+      <button onclick="modifyTodoDetails()">Save Details</button>
+    </div>
+    <input id="newItem" style="width:300px">
+    <button onclick="addItem()">Add Item</button>
+    <div id="items">
+    </div>
+  </main>
+</body>
+
+</html>
