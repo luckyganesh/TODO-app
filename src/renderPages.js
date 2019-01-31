@@ -24,7 +24,7 @@ const renderFiles = function (fs, req, res) {
   })
 }
 
-const loginHandler = function (fs, cookies, allusers, req, res) {
+const loginHandler = function (allusers, req, res) {
   const { id, password } = JSON.parse(req.body);
   if (allusers.validateUser(id, password)) {
     res.write(JSON.stringify({ status: 1 }))
@@ -35,7 +35,15 @@ const loginHandler = function (fs, cookies, allusers, req, res) {
   res.end();
 };
 
-const renderLoginPage = function (fs, req, res) {
+const renderLoginPage = function (fs, cookies, req, res) {
+  const id = +req.cookies.id;
+  if (id && cookies.isIdPresent(id)) {
+    res.writeHead(302, {
+      Location: '/'
+    });
+    res.end();
+    return;
+  }
   fs.readFile('./public/login.html', (err, content) => {
     if (err) {
       sendNotFound(req, res);
@@ -45,17 +53,15 @@ const renderLoginPage = function (fs, req, res) {
   })
 }
 
-const renderHomePage = function (fs, cookies, req, res) {
+const renderHomePage = function (cookies, req, res) {
   const id = +req.cookies.id;
-  if (id) {
-    if (cookies.isIdPresent(id)) {
-      let userId = cookies.giveMeUser(id).userId;
-      res.writeHead(302, {
-        Location: '/' + userId
-      })
-      res.end();
-      return;
-    }
+  if (id && cookies.isIdPresent(id)) {
+    let userId = cookies.giveMeUser(id).userId;
+    res.writeHead(302, {
+      Location: '/' + userId
+    })
+    res.end();
+    return;
   }
   res.writeHead(302, {
     Location: '/login'

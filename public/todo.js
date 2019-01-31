@@ -127,14 +127,14 @@ const updateDetails = function () {
     .then(details => createDetailsHtml(details));
 }
 
-const modifyTDetails = function () {
+const modifyTodoDetails = function () {
   const newTitle = getElementOfId('title').value;
   const newDescription = getElementOfId('description').value;
   if (newTitle === "") {
     updateDetails();
     return;
   }
-  fetch(`/${userId}/${todoId}/modifyDetails`, {
+  fetch(`/${userId}/${todoId}/modifyTodoDetails`, {
     method: 'POST',
     body: JSON.stringify({ newTitle, newDescription })
   }).then(res => updateDetails());

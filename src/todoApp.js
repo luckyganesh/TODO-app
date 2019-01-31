@@ -7,6 +7,7 @@ const {
   Todo
 } = require('./entities.js');
 
+const { sendNotFound } = require('./send_handler.js')
 const todoPageHtml = fs.readFileSync('./public/todo.html', 'utf8');
 
 const TODOLIST_HTMLPAGE = fs.readFileSync('./public/todos.html', 'utf8');
@@ -39,10 +40,10 @@ const deleteTodo = function (req, res) {
   res.end();
 }
 
-const createTodoFile = function (todo) {
+const createTodoFile = function (userId, todo) {
   const todoData = JSON.stringify(todo.getTodo());
   const todoId = todo.getDetails().id;
-  const path = `./sai/todos/${todoId}.json`;
+  const path = `./users/${userId}/todos/${todoId}.json`;
   fs.writeFile(path, todoData, (err) => {
     if (err) console.log(err);
   })
@@ -54,7 +55,8 @@ const addTodo = function (req, res) {
   todoDetails.id = Date.now();
   const todo = new Todo(todoDetails, items);
   req.user.addTodo(todo);
-  createTodoFile(todo);
+  const userId = req.user.details.id;
+  createTodoFile(userId, todo);
   res.end();
 }
 

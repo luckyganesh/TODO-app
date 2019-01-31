@@ -90,8 +90,8 @@ const createUserHandler = function (req, res) {
   users.addUser(userDetail, todos);
   allUsersDetails.addUser(user);
   fs.mkdir(`./users/${id}`, () => {
-    fs.writeFile(`./users/${id}/details.json`, JSON.stringify(userDetail), () => { });
-    fs.mkdir(`/users/${id}/todos`, () => { });
+    fs.writeFile(`./users/${id}/userDetails.json`, JSON.stringify(userDetail), () => { });
+    fs.mkdir(`./users/${id}/todos`, () => { });
   })
 }
 
@@ -156,9 +156,9 @@ app.use(readBody);
 app.use(readCookies);
 app.use(userHandler);
 app.post('/getCookie', renderLoggedin)
-app.post('/login', loginHandler.bind(null, fs, cookies, allUsersDetails));
-app.get('/login', renderLoginPage.bind(null, fs));
-app.get('/', renderHomePage.bind(null, fs, cookies));
+app.post('/login', loginHandler.bind(null, allUsersDetails));
+app.get('/login', renderLoginPage.bind(null, fs, cookies));
+app.get('/', renderHomePage.bind(null, cookies));
 app.post('/upload', createUserHandler);
 app.get('/logout', logoutHandler);
 app.use(renderFiles.bind(null, fs));
