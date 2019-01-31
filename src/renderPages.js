@@ -12,12 +12,19 @@ const getType = function (fileName) {
   return MIME_TYPES[type] || MIME_TEXT_PLAIN;
 }
 
+const redirectLoggedIn = function (res) {
+  res.writeHead(302, {
+    Location: '/login'
+  })
+  res.end();
+}
+
 const renderFiles = function (fs, req, res) {
   const filePath = addPrefix(req.url);
   const contentType = getType(req.url);
   fs.readFile(filePath, (err, content) => {
     if (err) {
-      sendNotFound(req, res);
+      redirectLoggedIn(res);
       return;
     }
     send(res, 200, content, contentType);

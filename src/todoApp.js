@@ -175,7 +175,7 @@ app.post('/deleteTodo', deleteTodo);
 app.post('/getTodo', sendTodoList);
 app.use(checkValidTodo);
 app.post(/\/.*\/getTasks/, getTasks);
-app.post(/\/.*\/getDetails /, getDetails);
+app.post(/\/.*\/getDetails/, getDetails);
 app.post(/\/.*\/addTask/, addTask);
 app.post(/\/.*\/deleteTask/, deleteTask);
 app.post(/\/.*\/toggleTaskStatus/, toggleTaskStatus);

@@ -1,3 +1,26 @@
+const EDIT_TEMPLATE = `<p>
+  <label>Title:</label>
+  <input id="title">
+      </p>
+  <p>
+    <label>Description : </label>
+    <textarea id="description"></textarea>
+  </p>
+  <button onclick="modifyTodoDetails()">Save Details</button>`;
+
+const template = `<h3 id="title">
+      </h3>
+      <h5 id="description"></h5>
+      <button onclick="changeDetailTemplate()">Edit</button>`;
+
+const changeDetailTemplate = function () {
+  const title = document.getElementById('title').innerText
+  const description = document.getElementById('description').innerText;
+  document.getElementById('details').innerHTML = EDIT_TEMPLATE;
+  document.getElementById('title').value = title;
+  document.getElementById('description').value = description;
+}
+
 const changeStatus = function (status) {
   return status === 'Undone' ? 'Done' : 'Undone';
 }
@@ -73,8 +96,9 @@ const createTasksHtml = function (tasks) {
 }
 
 const createDetailsHtml = function (details) {
-  getElementOfId('title').value = details.title;
-  getElementOfId('description').value = details.description;
+  getElementOfId('details').innerHTML = template;
+  getElementOfId('title').innerText = details.title;
+  getElementOfId('description').innerText = details.description;
 }
 
 const createTodoPage = function (todo) {
@@ -135,7 +159,10 @@ const modifyTodoDetails = function () {
   fetch(`/${userId}/${todoId}/modifyTodoDetails`, {
     method: 'POST',
     body: JSON.stringify({ newTitle, newDescription })
-  }).then(res => updateDetails());
+  }).then(res => {
+    document.getElementById('details').innerHTML = template;
+    updateDetails()
+  });
 }
 
 const initialize = function () {
