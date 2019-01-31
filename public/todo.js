@@ -3,10 +3,10 @@ const changeStatus = function (status) {
 }
 
 const toggleStatus = function () {
-  const itemId = event.target.id
-  fetch(`/${userId}/${todoId}/toggleItemStatus`, {
+  const taskId = event.target.id
+  fetch(`/${userId}/${todoId}/toggleTaskStatus`, {
     method: 'POST',
-    body: JSON.stringify({ itemId })
+    body: JSON.stringify({ taskId })
   });
   const status = event.target.innerText;
   event.target.innerText = changeStatus(status);
@@ -17,61 +17,59 @@ const changeInnerText = function (element, innerText) {
   return element;
 }
 
-const submitItem = function () {
+const submitTask = function () {
   const submitButton = event.target;
-  const itemId = submitButton.id;
-  const item = document.getElementById(itemId);
-  const itemContent = item.value;
-  fetch(`/${userId}/${todoId}/modifyItemContent`, {
+  const taskId = submitButton.id;
+  const task = document.getElementById(taskId);
+  const taskContent = task.value;
+  fetch(`/${userId}/${todoId}/modifyTaskContent`, {
     method: 'POST',
-    body: JSON.stringify({ itemId, itemContent })
+    body: JSON.stringify({ taskId, taskContent })
   })
-  const itemPara = createElement('p');
-  itemPara.id = itemId;
-  changeInnerText(itemPara, itemContent);
-  item.replaceWith(itemPara);
+  const taskPara = createElement('p');
+  taskPara.id = taskId;
+  changeInnerText(taskPara, taskContent);
+  task.replaceWith(taskPara);
   const editButton = changeInnerText(submitButton, 'edit');
-  editButton.onclick = editItem;
+  editButton.onclick = editTask;
 }
 
-const editItem = function () {
+const editTask = function () {
   const editButton = event.target;
   const id = editButton.id;
-  const itemPara = document.getElementById(id);
-  const itemInput = createElement('input');
-  itemInput.id = id;
-  itemInput.value = itemPara.innerText;
-  itemPara.replaceWith(itemInput);
+  const taskPara = document.getElementById(id);
+  const taskInput = createElement('input');
+  taskInput.id = id;
+  taskInput.value = taskPara.innerText;
+  taskPara.replaceWith(taskInput);
   const submitButton = changeInnerText(editButton, 'Submit');
-  submitButton.onclick = submitItem;
+  submitButton.onclick = submitTask;
 }
 
-const createItemHtml = function (item) {
-  const itemHtml = createElement('li');
+const createTaskHtml = function (task) {
+  const taskHtml = createElement('li');
   const buttonsHolder = createElement('p');
-  const status = item.status ? 'Undone' : 'Done';
-  const itemContent = createElementWithContent('p', item.content);
-  const itemStatus = createButton(status);
+  const status = task.status ? 'Undone' : 'Done';
+  const taskContent = createElementWithContent('p', task.content);
+  const taskStatus = createButton(status);
   const editButton = createButton('Edit');
   const deleteButton = createButton('Delete');
-  itemStatus.onclick = toggleStatus;
-  deleteButton.onclick = deleteItem;
-  editButton.onclick = editItem;
-  placeAttribute('id', [itemContent, itemStatus, editButton, deleteButton], item.id);
-  appendChilds(buttonsHolder, [itemStatus, editButton, deleteButton])
-  appendChilds(itemHtml, [itemContent, buttonsHolder]);
-  return itemHtml;
+  taskStatus.onclick = toggleStatus;
+  deleteButton.onclick = deleteTask;
+  editButton.onclick = editTask;
+  placeAttribute('id', [taskContent, taskStatus, editButton, deleteButton], task.id);
+  appendChilds(buttonsHolder, [taskStatus, editButton, deleteButton])
+  appendChilds(taskHtml, [taskContent, buttonsHolder]);
+  return taskHtml;
 }
 
-const createItemsHtml = function (items) {
-  const itemsDiv = document.getElementById('items');
-  itemsDiv.innerText = "";
-  const itemsLabel = createElementWithContent('h3', 'Items')
-  itemsDiv.appendChild(itemsLabel);
-  const itemsList = createElementWithId('ul', 'itemsList');
-  const itemsHtml = items.reverse().map(createItemHtml);
-  appendChilds(itemsList, itemsHtml);
-  itemsDiv.appendChild(itemsList);
+const createTasksHtml = function (tasks) {
+  const tasksDiv = document.getElementById('tasks');
+  tasksDiv.innerText = "";
+  const tasksList = createElementWithId('ul', 'tasksList');
+  const tasksHtml = tasks.reverse().map(createTaskHtml);
+  appendChilds(tasksList, tasksHtml);
+  tasksDiv.appendChild(tasksList);
 }
 
 const createDetailsHtml = function (details) {
@@ -81,7 +79,7 @@ const createDetailsHtml = function (details) {
 
 const createTodoPage = function (todo) {
   createDetailsHtml(todo.details);
-  createItemsHtml(todo.items);
+  createTasksHtml(todo.tasks);
 }
 
 const getTodo = function (todoId) {
@@ -92,31 +90,31 @@ const getTodo = function (todoId) {
     .then(todo => createTodoPage(todo));
 }
 
-const updateItems = function () {
-  fetch(`/${userId}/${todoId}/getItems`, {
+const updateTasks = function () {
+  fetch(`/${userId}/${todoId}/getTasks`, {
     method: 'POST',
     body: JSON.stringify({ todoId })
   }).then(res => res.json())
-    .then(items => createItemsHtml(items));
+    .then(tasks => createTasksHtml(tasks));
 }
 
-const addItem = function () {
-  const itemHolder = document.getElementById('newItem');
-  const itemContent = itemHolder.value;
-  if (itemContent === "") return;
-  fetch(`/${userId}/${todoId}/addItem`, {
+const addTask = function () {
+  const taskHolder = document.getElementById('newTask');
+  const taskContent = taskHolder.value;
+  if (taskContent === "") return;
+  fetch(`/${userId}/${todoId}/addTask`, {
     method: 'POST',
-    body: JSON.stringify({ itemContent })
-  }).then(() => updateItems());
-  itemHolder.value = "";
+    body: JSON.stringify({ taskContent })
+  }).then(() => updateTasks());
+  taskHolder.value = "";
 }
 
-const deleteItem = function () {
-  const itemId = event.target.id
-  fetch(`/${userId}/${todoId}/deleteItem`, {
+const deleteTask = function () {
+  const taskId = event.target.id
+  fetch(`/${userId}/${todoId}/deleteTask`, {
     method: 'POST',
-    body: JSON.stringify({ itemId })
-  }).then(() => updateItems());
+    body: JSON.stringify({ taskId })
+  }).then(() => updateTasks());
 }
 
 const updateDetails = function () {

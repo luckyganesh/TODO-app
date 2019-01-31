@@ -12,8 +12,8 @@ const { readBody, readCookies } = require(READ_OPTIONS);
 const { Express } = require(EXPRESS);
 const todoApp = require('./todoApp.js');
 
-const { Item,
-  Items,
+const { Task,
+  Tasks,
   Todo,
   Todos,
   User,
@@ -34,12 +34,12 @@ const readTodos = function (userId) {
   todosDir.forEach(todoDir => {
     const todoData = JSON.parse(fs.readFileSync(`./users/${userId}/todos/${todoDir}`, 'utf8'));
     const todoDetails = todoData.details;
-    const items = new Items();
-    todoData.items.forEach(({ id, status, content }) => {
-      let item = new Item(id, status, content);
-      items.addItem(item);
+    const tasks = new Tasks();
+    todoData.tasks.forEach(({ id, status, content }) => {
+      let task = new Task(id, status, content);
+      tasks.addTask(task);
     })
-    const todo = new Todo(todoDetails, items);
+    const todo = new Todo(todoDetails, tasks);
     todos.addTodo(todo);
   })
   return todos;
@@ -135,7 +135,6 @@ const userHandler = function (req, res, next) {
   const userId = req.url.split('/')[1];
   if (cookie.id && cookies.isPresent(cookie.id, userId)) {
     req.url = '/' + req.url.split('/').slice(2).join('/');
-    console.log(req.url);
     req.user = users.getUser(userId);
     todoApp(req, res);
     return;

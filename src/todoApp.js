@@ -2,8 +2,8 @@ const { Express } = require('./express.js');
 const fs = require('fs');
 const app = new Express();
 const {
-  Item,
-  Items,
+  Task,
+  Tasks,
   Todo
 } = require('./entities.js');
 
@@ -54,9 +54,9 @@ const deleteTodo = function (req, res) {
 }
 
 const createNewTodo = function (todoDetails) {
-  const items = new Items();
+  const tasks = new Tasks();
   todoDetails.id = Date.now();
-  return new Todo(todoDetails, items);
+  return new Todo(todoDetails, tasks);
 }
 const addTodo = function (req, res) {
   const todoDetails = JSON.parse(req.body);
@@ -96,47 +96,47 @@ const sendTodoList = function (req, res) {
 
 const getTodoId = (url) => url.split('/')[1];
 
-const createNewItem = function (itemContent) {
-  const itemId = Date.now();
+const createNewTask = function (taskContent) {
+  const taskId = Date.now();
   const status = true;
-  return new Item(itemId, status, itemContent);
+  return new Task(taskId, status, taskContent);
 }
 
-const addItem = function (req, res) {
+const addTask = function (req, res) {
   const todoId = getTodoId(req.url);
-  const { itemContent } = JSON.parse(req.body);
-  const item = createNewItem(itemContent);
-  req.user.addItemToTodo(todoId, item);
+  const { taskContent } = JSON.parse(req.body);
+  const task = createNewTask(taskContent);
+  req.user.addTaskToTodo(todoId, task);
   updateTodoAndEndRes(res, req.user, todoId);
   return;
 }
 
-const getItems = function (req, res) {
+const getTasks = function (req, res) {
   const todoId = getTodoId(req.url);
-  const items = JSON.stringify(req.user.getItems(todoId));
-  send(res, 200, items, 'application/json');
+  const tasks = JSON.stringify(req.user.getTasks(todoId));
+  send(res, 200, tasks, 'application/json');
   return;
 }
 
 const getDetails = function (req, res) {
   const todoId = getTodoId(req.url);
-  const items = JSON.stringify(req.user.getTodoDetails(todoId));
-  send(res, 200, items, 'application/json');
+  const tasks = JSON.stringify(req.user.getTodoDetails(todoId));
+  send(res, 200, tasks, 'application/json');
   return;
 }
 
-const toggleItemStatus = function (req, res) {
+const toggleTaskStatus = function (req, res) {
   const todoId = getTodoId(req.url);
-  const { itemId } = JSON.parse(req.body);
-  req.user.toggleTodoItemStatus(todoId, itemId);
+  const { taskId } = JSON.parse(req.body);
+  req.user.toggleTodoTaskStatus(todoId, taskId);
   updateTodoAndEndRes(res, req.user, todoId);
   return;
 }
 
-const deleteItem = function (req, res) {
+const deleteTask = function (req, res) {
   const todoId = getTodoId(req.url);
-  const { itemId } = JSON.parse(req.body);
-  req.user.deleteItemInTodo(todoId, itemId);
+  const { taskId } = JSON.parse(req.body);
+  req.user.deleteTaskInTodo(todoId, taskId);
   updateTodoAndEndRes(res, req.user, todoId);
   return;
 }
@@ -149,10 +149,10 @@ const modifyTodoDetails = function (req, res) {
   return;
 }
 
-const modifyItemContent = function (req, res) {
+const modifyTaskContent = function (req, res) {
   const todoId = getTodoId(req.url);
-  const { itemId, itemContent } = JSON.parse(req.body);
-  req.user.modifyTodoItemContent(todoId, itemId, itemContent);
+  const { taskId, taskContent } = JSON.parse(req.body);
+  req.user.modifyTodoTaskContent(todoId, taskId, taskContent);
   updateTodoAndEndRes(res, req.user, todoId);
   return;
 }
@@ -172,12 +172,12 @@ app.post('/addTodo', addTodo);
 app.post('/deleteTodo', deleteTodo);
 app.post('/getTodo', sendTodoList);
 app.use(checkValidTodo);
-app.post(/\/.*\/getItems/, getItems);
+app.post(/\/.*\/getTasks/, getTasks);
 app.post(/\/.*\/getDetails /, getDetails);
-app.post(/\/.*\/addItem/, addItem);
-app.post(/\/.*\/deleteItem/, deleteItem);
-app.post(/\/.*\/toggleItemStatus/, toggleItemStatus);
+app.post(/\/.*\/addTask/, addTask);
+app.post(/\/.*\/deleteTask/, deleteTask);
+app.post(/\/.*\/toggleTaskStatus/, toggleTaskStatus);
 app.post(/\/.*\/modifyTodoDetails/, modifyTodoDetails);
-app.post(/\/.*\/modifyItemContent/, modifyItemContent);
+app.post(/\/.*\/modifyTaskContent/, modifyTaskContent);
 
 module.exports = app.requestHandler.bind(app);

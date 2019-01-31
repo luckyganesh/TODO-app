@@ -2,14 +2,14 @@ const deleteElement = function (todo, index) {
   return todo.slice(0, index).concat(todo.slice(index + 1));
 }
 
-class Item {
+class Task {
   constructor(id, status, content) {
     this.id = id;
     this.status = status;
     this.content = content;
   }
 
-  getItem() {
+  getTask() {
     let { id, status, content } = this;
     return { id, status, content };
   }
@@ -22,56 +22,56 @@ class Item {
     this.content = newContent;
   }
 
-  isSameItem(itemId) {
-    return this.id == itemId;
+  isSameTask(taskId) {
+    return this.id == taskId;
   }
 }
 
-class Items {
+class Tasks {
   constructor() {
-    this.items = [];
+    this.tasks = [];
   }
 
-  isItemPresent(itemId) {
-    return this.items.some(item => item.isSame(itemId));
+  isTaskPresent(taskId) {
+    return this.tasks.some(task => task.isSame(taskId));
   }
 
-  getItem(itemId) {
-    return this.items.find(item => item.isSameItem(itemId));
+  getTask(taskId) {
+    return this.tasks.find(task => task.isSameTask(taskId));
   }
 
-  getItems() {
-    return this.items;
+  getTasks() {
+    return this.tasks;
   }
 
-  getItemIndex(itemId) {
-    return this.items.findIndex(item => item.isSameItem(itemId));
+  getTaskIndex(taskId) {
+    return this.tasks.findIndex(task => task.isSameTask(taskId));
   }
 
-  modifyItemContent(itemId, newContent) {
-    let item = this.getItem(itemId);
-    item.modifyContent(newContent);
+  modifyTaskContent(taskId, newContent) {
+    let task = this.getTask(taskId);
+    task.modifyContent(newContent);
   }
 
-  addItem(item) {
-    this.items.push(item)
+  addTask(task) {
+    this.tasks.push(task)
   }
 
-  deleteItem(itemId) {
-    let itemIndex = this.getItemIndex(itemId);
-    this.items = deleteElement(this.items, itemIndex);
+  deleteTask(taskId) {
+    let taskIndex = this.getTaskIndex(taskId);
+    this.tasks = deleteElement(this.tasks, taskIndex);
   }
 
-  toggleItemStatus(itemId) {
-    let item = this.getItem(itemId);
-    item.toggleStatus();
+  toggleTaskStatus(taskId) {
+    let task = this.getTask(taskId);
+    task.toggleStatus();
   }
 }
 
 class Todo {
-  constructor(details, items) {
+  constructor(details, tasks) {
     this.details = details
-    this.items = items;
+    this.tasks = tasks;
   }
 
   isSameTodo(todoId) {
@@ -88,36 +88,36 @@ class Todo {
   }
 
   getTodo() {
-    let { details, items } = this;
-    return { details, items: items.getItems() };
+    let { details, tasks } = this;
+    return { details, tasks: tasks.getTasks() };
   }
 
-  isItemPresent(itemId) {
-    return this.items.some(item => item.isSame(itemId));
+  isTaskPresent(taskId) {
+    return this.tasks.some(task => task.isSame(taskId));
   }
 
-  getItem(itemId) {
-    this.items.getItem(itemId);
+  getTask(taskId) {
+    this.tasks.getTask(taskId);
   }
 
-  getItems() {
-    return this.items.getItems();
+  getTasks() {
+    return this.tasks.getTasks();
   }
 
-  modifyItemContent(itemId, newContent) {
-    this.items.modifyItemContent(itemId, newContent);
+  modifyTaskContent(taskId, newContent) {
+    this.tasks.modifyTaskContent(taskId, newContent);
   }
 
-  addItem(item) {
-    this.items.addItem(item);
+  addTask(task) {
+    this.tasks.addTask(task);
   }
 
-  deleteItem(itemId) {
-    this.items.deleteItem(itemId);
+  deleteTask(taskId) {
+    this.tasks.deleteTask(taskId);
   }
 
-  toggleItemStatus(itemId) {
-    this.items.toggleItemStatus(itemId);
+  toggleTaskStatus(taskId) {
+    this.tasks.toggleTaskStatus(taskId);
   }
 }
 
@@ -174,40 +174,40 @@ class Todos {
     this.todos = deleteElement(this.todos, index);
   }
 
-  isItemPresent(todoId, itemId) {
+  isTaskPresent(todoId, taskId) {
     if (!this.isTodoPresent(todoId)) return false;
     let todo = this.getTodo(todoId);
-    return todo.isItemPresent(itemId);
+    return todo.isTaskPresent(taskId);
   }
 
-  getItem(todoId, itemId) {
+  getTask(todoId, taskId) {
     let todo = this.getTodo(todoId);
-    return todo.getItem(itemId);
+    return todo.getTask(taskId);
   }
 
-  getItems(todoId) {
+  getTasks(todoId) {
     let todo = this.getTodo(todoId);
-    return todo.getItems();
+    return todo.getTasks();
   }
 
-  modifyTodoItemContent(todoId, itemId, newContent) {
+  modifyTodoTaskContent(todoId, taskId, newContent) {
     let todo = this.getTodo(todoId);
-    todo.modifyItemContent(itemId, newContent);
+    todo.modifyTaskContent(taskId, newContent);
   }
 
-  addItemToTodo(todoId, item) {
+  addTaskToTodo(todoId, task) {
     let todo = this.getTodo(todoId);
-    todo.addItem(item);
+    todo.addTask(task);
   }
 
-  deleteItemInTodo(todoId, itemId) {
+  deleteTaskInTodo(todoId, taskId) {
     let todo = this.getTodo(todoId);
-    todo.deleteItem(itemId);
+    todo.deleteTask(taskId);
   }
 
-  toggleTodoItemStatus(todoId, itemId) {
+  toggleTodoTaskStatus(todoId, taskId) {
     let todo = this.getTodo(todoId);
-    todo.toggleItemStatus(itemId);
+    todo.toggleTaskStatus(taskId);
   }
 }
 
@@ -257,32 +257,32 @@ class User {
     this.todos.deleteTodo(todoId);
   }
 
-  isItemPresent(todoId, itemId) {
-    return this.todos.isItemPresent(todoId, itemId);
+  isTaskPresent(todoId, taskId) {
+    return this.todos.isTaskPresent(todoId, taskId);
   }
 
-  getItem(todoId, itemId) {
-    return this.todos.getItem(todoId, itemId);
+  getTask(todoId, taskId) {
+    return this.todos.getTask(todoId, taskId);
   }
 
-  getItems(todoId) {
-    return this.todos.getItems(todoId);
+  getTasks(todoId) {
+    return this.todos.getTasks(todoId);
   }
 
-  modifyTodoItemContent(todoId, itemId, newContent) {
-    this.todos.modifyTodoItemContent(todoId, itemId, newContent);
+  modifyTodoTaskContent(todoId, taskId, newContent) {
+    this.todos.modifyTodoTaskContent(todoId, taskId, newContent);
   }
 
-  addItemToTodo(todoId, item) {
-    this.todos.addItemToTodo(todoId, item);
+  addTaskToTodo(todoId, task) {
+    this.todos.addTaskToTodo(todoId, task);
   }
 
-  deleteItemInTodo(todoId, itemId) {
-    this.todos.deleteItemInTodo(todoId, itemId);
+  deleteTaskInTodo(todoId, taskId) {
+    this.todos.deleteTaskInTodo(todoId, taskId);
   }
 
-  toggleTodoItemStatus(todoId, itemId) {
-    this.todos.toggleTodoItemStatus(todoId, itemId);
+  toggleTodoTaskStatus(todoId, taskId) {
+    this.todos.toggleTodoTaskStatus(todoId, taskId);
   }
 
   modifyTodoDetails(todoId, details) {
@@ -344,8 +344,8 @@ class Users {
 
 
 module.exports = {
-  Item,
-  Items,
+  Task,
+  Tasks,
   Todo,
   Todos,
   User,
