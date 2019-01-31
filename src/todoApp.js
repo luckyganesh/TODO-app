@@ -1,5 +1,5 @@
-const { Express } = require('./express.js');
 const fs = require('fs');
+const { Express } = require('./express.js');
 const app = new Express();
 const {
   Task,
@@ -8,13 +8,16 @@ const {
 } = require('./entities.js');
 
 const { send, sendNotFound } = require('./send_handler.js')
-const todoPageHtml = fs.readFileSync('./public/todo.html', 'utf8');
 
-const TODOLIST_HTMLPAGE = fs.readFileSync('./public/todos.html', 'utf8');
+const TASKS_HTML = fs.readFileSync('./public/todo.html', 'utf8');
 
-const renderHomePage = function (req, res) {
+const TODOS_HTML = fs.readFileSync('./public/todos.html', 'utf8');
+
+const getTodoId = (url) => url.split('/')[1];
+
+const renderTodosPage = function (req, res) {
   const userId = req.user.details.id;
-  res.write(TODOLIST_HTMLPAGE.replace('##userId##', userId));
+  res.write(TODOS_HTML.replace('##userId##', userId));
   res.end();
 }
 
@@ -58,6 +61,7 @@ const createNewTodo = function (todoDetails) {
   todoDetails.id = Date.now();
   return new Todo(todoDetails, tasks);
 }
+
 const addTodo = function (req, res) {
   const todoDetails = JSON.parse(req.body);
   const todo = createNewTodo(todoDetails);
@@ -67,7 +71,7 @@ const addTodo = function (req, res) {
 }
 
 const todoPage = function (userId, todoId) {
-  const page = todoPageHtml.replace('##todoId##', todoId);
+  const page = TASKS_HTML.replace('##todoId##', todoId);
   return page.replace('##userId##', userId);
 }
 
@@ -93,8 +97,6 @@ const sendTodoList = function (req, res) {
   send(res, 200, todoData, 'application/json');
   return;
 }
-
-const getTodoId = (url) => url.split('/')[1];
 
 const createNewTask = function (taskContent) {
   const taskId = Date.now();
@@ -166,7 +168,7 @@ const checkValidTodo = function (req, res, next) {
 }
 
 app.use(renderTodoDetail);
-app.get('/', renderHomePage);
+app.get('/', renderTodosPage);
 app.post('/todos', sendTodos);
 app.post('/addTodo', addTodo);
 app.post('/deleteTodo', deleteTodo);
@@ -179,5 +181,6 @@ app.post(/\/.*\/deleteTask/, deleteTask);
 app.post(/\/.*\/toggleTaskStatus/, toggleTaskStatus);
 app.post(/\/.*\/modifyTodoDetails/, modifyTodoDetails);
 app.post(/\/.*\/modifyTaskContent/, modifyTaskContent);
+app.use(sendNotFound);
 
 module.exports = app.requestHandler.bind(app);
