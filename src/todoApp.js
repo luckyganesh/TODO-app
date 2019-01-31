@@ -24,10 +24,16 @@ const sendTodos = function (req, res) {
   return;
 }
 
-const updateTodo = function (user, todoId) {
+const updateTodoFile = function (user, todoId) {
   fs.writeFile(`./users/${user.details.id}/todos/${todoId}.json`, JSON.stringify(user.getTodoJson(todoId)), (err) => {
     if (err) console.log(err);
   })
+}
+
+const updateTodoAndEndRes = function (res, user, todoId) {
+  updateTodoFile(user, todoId);
+  res.end();
+  return;
 }
 
 const deleteTodoFile = function (userId, todoId) {
@@ -53,8 +59,8 @@ const addTodo = function (req, res) {
   todoDetails.id = Date.now();
   const todo = new Todo(todoDetails, items);
   req.user.addTodo(todo);
-  updateTodo(req.user, todoDetails.id);
-  res.end();
+  updateTodoAndEndRes(res, req.user, todoDetails.id);
+  return;
 }
 
 const todoPage = function (userId, todoId) {
@@ -97,8 +103,8 @@ const addItem = function (req, res) {
   const { itemContent } = JSON.parse(req.body);
   const item = createNewItem(itemContent);
   req.user.addItemToTodo(todoId, item);
-  updateTodo(req.user, todoId);
-  res.end();
+  updateTodoAndEndRes(res, req.user, todoId);
+  return;
 }
 
 const getItems = function (req, res) {
@@ -127,8 +133,7 @@ const toggleItemStatus = function (req, res) {
   const todoId = getTodoId(req.url);
   const { itemId } = JSON.parse(req.body);
   req.user.toggleTodoItemStatus(todoId, itemId);
-  updateTodo(req.user, todoId)
-  res.end();
+  updateTodoAndEndRes(res, req.user, todoId);
   return;
 }
 
@@ -136,8 +141,7 @@ const deleteItem = function (req, res) {
   const todoId = getTodoId(req.url);
   const { itemId } = JSON.parse(req.body);
   req.user.deleteItemInTodo(todoId, itemId);
-  updateTodo(req.user, todoId)
-  res.end();
+  updateTodoAndEndRes(res, req.user, todoId);
   return;
 }
 
@@ -145,8 +149,7 @@ const modifyTodoDetails = function (req, res) {
   const todoId = getTodoId(req.url);
   const details = JSON.parse(req.body);
   req.user.modifyTodoDetails(todoId, details);
-  updateTodo(req.user, todoId)
-  res.end();
+  updateTodoAndEndRes(res, req.user, todoId);
   return;
 }
 
@@ -154,8 +157,7 @@ const modifyItemContent = function (req, res) {
   const todoId = getTodoId(req.url);
   const { itemId, itemContent } = JSON.parse(req.body);
   req.user.modifyTodoItemContent(todoId, itemId, itemContent);
-  updateTodo(req.user, todoId)
-  res.end();
+  updateTodoAndEndRes(res, req.user, todoId);
   return;
 }
 
