@@ -7,7 +7,7 @@ const {
   Todo
 } = require('./entities.js');
 
-const { sendNotFound } = require('./send_handler.js')
+const { send, sendNotFound } = require('./send_handler.js')
 const todoPageHtml = fs.readFileSync('./public/todo.html', 'utf8');
 
 const TODOLIST_HTMLPAGE = fs.readFileSync('./public/todos.html', 'utf8');
@@ -19,13 +19,19 @@ const renderHomePage = function (req, res) {
 }
 
 const sendTodos = function (req, res) {
-  res.setHeader('Content-Type', 'application/json');
-  res.write(JSON.stringify(req.user.getTodosDetails()));
-  res.end()
+  const content = JSON.stringify(req.user.getTodosDetails());
+  send(res, 200, content, 'application/json');
+  return;
 }
 
-const deleteTodoFile = function (todoId) {
-  let path = `./sai/todos/${todoId}.json`;
+const updateTodo = function (user, todoId) {
+  fs.writeFile(`./users/${user.details.id}/todos/${todoId}.json`, JSON.stringify(user.getTodoJson(todoId)), (err) => {
+    if (err) console.log(err);
+  })
+}
+
+const deleteTodoFile = function (userId, todoId) {
+  let path = `./users/${userId}/todos/${todoId}.json`;
   fs.unlink(path, (err) => {
     if (err) {
       console.log(err);
@@ -36,17 +42,9 @@ const deleteTodoFile = function (todoId) {
 const deleteTodo = function (req, res) {
   let { todoId } = JSON.parse(req.body);
   req.user.deleteTodo(todoId);
-  deleteTodoFile(todoId);
+  const userId = req.user.details.id;
+  deleteTodoFile(userId, todoId);
   res.end();
-}
-
-const createTodoFile = function (userId, todo) {
-  const todoData = JSON.stringify(todo.getTodo());
-  const todoId = todo.getDetails().id;
-  const path = `./users/${userId}/todos/${todoId}.json`;
-  fs.writeFile(path, todoData, (err) => {
-    if (err) console.log(err);
-  })
 }
 
 const addTodo = function (req, res) {
@@ -55,8 +53,7 @@ const addTodo = function (req, res) {
   todoDetails.id = Date.now();
   const todo = new Todo(todoDetails, items);
   req.user.addTodo(todo);
-  const userId = req.user.details.id;
-  createTodoFile(userId, todo);
+  updateTodo(req.user, todoDetails.id);
   res.end();
 }
 
@@ -68,10 +65,9 @@ const todoPage = function (userId, todoId) {
 const renderTodoDetail = function (req, res, next) {
   const todoId = req.url.slice(1);
   if (+todoId && req.user.isTodoPresent(todoId)) {
-    res.setHeader('Content-Type', 'text/html');
     const userId = req.user.details.id;
-    res.write(todoPage(userId, todoId));
-    res.end();
+    const content = todoPage(userId, todoId);
+    send(res, 200, content, 'text/html');
     return;
   }
   next();
@@ -80,17 +76,16 @@ const renderTodoDetail = function (req, res, next) {
 const sendTodoList = function (req, res) {
   const { todoId } = JSON.parse(req.body);
   const todoData = JSON.stringify(req.user.getTodoJson(todoId));
-  res.setHeader('Content-Type', 'application/json')
-  res.write(todoData)
-  res.end();
+  send(res, 200, todoData, 'application/json');
+  return;
 }
 
 const getTodoId = (url) => url.split('/')[1];
 
-const updateTodo = function (user, todoId) {
-  fs.writeFile(`./users/${user.details.id}/todos/${todoId}.json`, JSON.stringify(user.getTodoJson(todoId)), (err) => {
-    if (err) console.log(err);
-  })
+const createNewItem = function (itemContent) {
+  const itemId = Date.now();
+  const status = true;
+  return new Item(itemId, status, itemContent);
 }
 
 const addItem = function (req, res) {
@@ -100,9 +95,7 @@ const addItem = function (req, res) {
     return;
   }
   const { itemContent } = JSON.parse(req.body);
-  const itemId = Date.now();
-  const status = true;
-  const item = new Item(itemId, status, itemContent);
+  const item = createNewItem(itemContent);
   req.user.addItemToTodo(todoId, item);
   updateTodo(req.user, todoId);
   res.end();
@@ -110,15 +103,13 @@ const addItem = function (req, res) {
 
 const getItems = function (req, res) {
   const todoId = getTodoId(req.url);
-  console.log('it came')
   if (!req.user.isTodoPresent(todoId)) {
     sendNotFound(req, res);
     return;
   }
   const items = JSON.stringify(req.user.getItems(todoId));
-  res.setHeader('Content-Type', 'application/json');
-  res.write(items);
-  res.end();
+  send(res, 200, items, 'application/json');
+  return;
 }
 
 const getDetails = function (req, res) {
@@ -128,9 +119,8 @@ const getDetails = function (req, res) {
     return;
   }
   const items = JSON.stringify(req.user.getTodoDetails(todoId));
-  res.setHeader('Content-Type', 'application/json');
-  res.write(items);
-  res.end();
+  send(res, 200, items, 'application/json');
+  return;
 }
 
 const toggleItemStatus = function (req, res) {
