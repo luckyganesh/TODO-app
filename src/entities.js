@@ -217,8 +217,20 @@ class User {
     this.todos = todos;
   }
 
-  isSameUser(userId) {
-    return this.details.id === userId;
+  getId() {
+    return this.details.getId();
+  }
+
+  isSameId(userId) {
+    return this.details.isSameId(userId);
+  }
+
+  isSameUser(id, password) {
+    return this.details.isSameUser(id, password);
+  }
+
+  getUserDetails() {
+    return this.details.getDetails();
   }
 
   isTodoPresent(todoId) {
@@ -306,27 +318,8 @@ class UserDetail {
   isSameUser(id, password) {
     return this.id == id && this.password == password;
   }
-}
-
-const isSameUser = function (userId, user) {
-  return user.isSameId(userId)
-}
-
-class AllUsersDetail {
-  constructor() {
-    this.users = [];
-  }
-  addUser(user) {
-    this.users.push(user);
-  }
-  getUserDetail(userId) {
-    return this.users.find(isSameUser.bind(null, userId));
-  }
-  isAlreadyPresent(userId) {
-    return this.users.some(isSameUser.bind(null, userId));
-  }
-  validateUser(userId, password) {
-    return this.users.some(user => user.isSameUser(userId, password));
+  getId() {
+    return this.id;
   }
 }
 
@@ -338,7 +331,16 @@ class Users {
     this.users.push(user);
   }
   getUser(userId) {
-    return this.users.find(user => user.isSameUser(userId));
+    return this.users.find(user => user.isSameId(userId));
+  }
+  getUserDetail(userId) {
+    return this.getUser(userId).getUserDetails();
+  }
+  isAlreadyPresent(userId) {
+    return this.users.some(user => user.isSameId(userId));
+  }
+  validateUser(userId, password) {
+    return this.users.some(user => user.isSameId(userId, password));
   }
 }
 
@@ -349,7 +351,6 @@ module.exports = {
   Todo,
   Todos,
   User,
-  AllUsersDetail,
   UserDetail,
   Users
 }

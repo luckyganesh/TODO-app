@@ -17,7 +17,6 @@ const { Task,
   Todo,
   Todos,
   User,
-  AllUsersDetail,
   UserDetail,
   Users } = require(ENTITIES);
 
@@ -25,7 +24,6 @@ const { Cookie, Cookies } = require(COOKIES);
 
 const cookies = new Cookies();
 const app = new Express();
-const allUsersDetails = new AllUsersDetail();
 const users = new Users();
 
 const readTodos = function (userId) {
@@ -53,9 +51,8 @@ const readUsers = function () {
   usersIds.forEach(userId => {
     const details = JSON.parse(fs.readFileSync(`./users/${userId}/userDetails.json`, ENCODING));
     const todos = readTodos(userId);
-    const userDetail = new UserDetail(details);
-    allUsersDetails.addUser(userDetail);
-    const user = new User(details, todos);
+    const userDetails = new UserDetail(details);
+    const user = new User(userDetails, todos);
     users.addUser(user);
   });
 }
@@ -80,10 +77,9 @@ readUsers();
 const createUserHandler = function (req, res) {
   let userDetail = JSON.parse(req.body);
   const { id } = userDetail;
-  if (allUsersDetails.isAlreadyPresent(id)) {
+  if (users.isAlreadyPresent(id)) {
     res.write(JSON.stringify({ status: 0 }))
     res.end();
-    console.log(allUsersDetails);
     return;
   }
   res.write(JSON.stringify({ status: 1 }))
@@ -91,7 +87,7 @@ const createUserHandler = function (req, res) {
   let user = new UserDetail(userDetail);
   const todos = new Todos()
   users.addUser(userDetail, todos);
-  allUsersDetails.addUser(user);
+  users.addUser(user);
   fs.mkdir(`./users/${id}`, () => {
     fs.writeFile(`./users/${id}/userDetails.json`, JSON.stringify(userDetail), () => { });
     fs.mkdir(`./users/${id}/todos`, () => { });
@@ -157,7 +153,7 @@ app.use(readBody);
 app.use(readCookies);
 app.use(userHandler);
 app.post('/getCookie', provideCookie)
-app.post('/login', loginHandler.bind(null, allUsersDetails));
+app.post('/login', loginHandler.bind(null, users));
 app.get('/login', renderLoginPage.bind(null, fs, cookies));
 app.get('/', renderHomePage.bind(null, cookies));
 app.post('/createNewUser', createUserHandler);

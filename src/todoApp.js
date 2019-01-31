@@ -16,7 +16,7 @@ const TODOS_HTML = fs.readFileSync('./public/todos.html', 'utf8');
 const getTodoId = (url) => url.split('/')[1];
 
 const renderTodosPage = function (req, res) {
-  const userId = req.user.details.id;
+  const userId = req.user.getId();
   res.write(TODOS_HTML.replace('##userId##', userId));
   res.end();
 }
@@ -28,7 +28,7 @@ const sendTodos = function (req, res) {
 }
 
 const updateTodoFile = function (user, todoId) {
-  fs.writeFile(`./users/${user.details.id}/todos/${todoId}.json`, JSON.stringify(user.getTodoJson(todoId)), (err) => {
+  fs.writeFile(`./users/${user.getId()}/todos/${todoId}.json`, JSON.stringify(user.getTodoJson(todoId)), (err) => {
     if (err) console.log(err);
   })
 }
@@ -51,7 +51,7 @@ const deleteTodoFile = function (userId, todoId) {
 const deleteTodo = function (req, res) {
   let { todoId } = JSON.parse(req.body);
   req.user.deleteTodo(todoId);
-  const userId = req.user.details.id;
+  const userId = req.user.getId();
   deleteTodoFile(userId, todoId);
   res.end();
 }
@@ -85,7 +85,7 @@ const renderTodoDetail = function (req, res, next) {
     next();
     return;
   }
-  const userId = req.user.details.id;
+  const userId = req.user.getId();
   const content = todoPage(userId, todoId);
   send(res, 200, content, 'text/html');
   return;
