@@ -12,7 +12,7 @@ const addUser = function () {
   }).then(res => {
     return res.json();
   }).then(data => {
-    if (data.status == 0) {
+    if (data.status == 1) {
       document.getElementById('error').style.visibility = 'visible';
       form.id.value = "";
       return;

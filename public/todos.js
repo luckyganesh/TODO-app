@@ -86,9 +86,8 @@ const addTodo = function () {
 }
 
 const getTodos = function () {
-  fetch(`/${userId}/todos`, {
-    method: 'POST'
-  })
+  const path = `/${userId}/todos`;
+  fetch(path, { method: 'POST' })
     .then(res => res.json())
     .then(data => {
       const todos = document.getElementById('todos');

@@ -27,32 +27,9 @@ const sendTodos = function (req, res) {
   return;
 }
 
-const updateTodoFile = function (user, todoId) {
-  fs.writeFile(`./users/${user.getId()}/todos/${todoId}.json`, JSON.stringify(user.getTodoJson(todoId)), (err) => {
-    if (err) console.log(err);
-  })
-}
-
-const updateTodoAndEndRes = function (res, user, todoId) {
-  updateTodoFile(user, todoId);
-  res.end();
-  return;
-}
-
-const deleteTodoFile = function (userId, todoId) {
-  let path = `./users/${userId}/todos/${todoId}.json`;
-  fs.unlink(path, (err) => {
-    if (err) {
-      console.log(err);
-    }
-  })
-}
-
 const deleteTodo = function (req, res) {
   let { todoId } = JSON.parse(req.body);
   req.user.deleteTodo(todoId);
-  const userId = req.user.getId();
-  deleteTodoFile(userId, todoId);
   res.end();
 }
 
@@ -66,7 +43,7 @@ const addTodo = function (req, res) {
   const todoDetails = JSON.parse(req.body);
   const todo = createNewTodo(todoDetails);
   req.user.addTodo(todo);
-  updateTodoAndEndRes(res, req.user, todoDetails.id);
+  res.end();
   return;
 }
 
@@ -109,7 +86,7 @@ const addTask = function (req, res) {
   const { taskContent } = JSON.parse(req.body);
   const task = createNewTask(taskContent);
   req.user.addTaskToTodo(todoId, task);
-  updateTodoAndEndRes(res, req.user, todoId);
+  res.end();
   return;
 }
 
@@ -131,7 +108,7 @@ const toggleTaskStatus = function (req, res) {
   const todoId = getTodoId(req.url);
   const { taskId } = JSON.parse(req.body);
   req.user.toggleTodoTaskStatus(todoId, taskId);
-  updateTodoAndEndRes(res, req.user, todoId);
+  res.end();
   return;
 }
 
@@ -139,7 +116,7 @@ const deleteTask = function (req, res) {
   const todoId = getTodoId(req.url);
   const { taskId } = JSON.parse(req.body);
   req.user.deleteTaskInTodo(todoId, taskId);
-  updateTodoAndEndRes(res, req.user, todoId);
+  res.end();
   return;
 }
 
@@ -147,7 +124,7 @@ const modifyTodoDetails = function (req, res) {
   const todoId = getTodoId(req.url);
   const details = JSON.parse(req.body);
   req.user.modifyTodoDetails(todoId, details);
-  updateTodoAndEndRes(res, req.user, todoId);
+  res.end();
   return;
 }
 
@@ -155,7 +132,7 @@ const modifyTaskContent = function (req, res) {
   const todoId = getTodoId(req.url);
   const { taskId, taskContent } = JSON.parse(req.body);
   req.user.modifyTodoTaskContent(todoId, taskId, taskContent);
-  updateTodoAndEndRes(res, req.user, todoId);
+  res.end();
   return;
 }
 

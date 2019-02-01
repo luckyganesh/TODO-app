@@ -44,6 +44,10 @@ class Tasks {
     return this.tasks;
   }
 
+  getTasksJson() {
+    return this.tasks.map(task => task.getTask());
+  }
+
   getTaskIndex(taskId) {
     return this.tasks.findIndex(task => task.isSameTask(taskId));
   }
@@ -88,8 +92,8 @@ class Todo {
   }
 
   getTodo() {
-    let { details, tasks } = this;
-    return { details, tasks: tasks.getTasks() };
+    const { details, tasks } = this;
+    return { details, tasks: tasks.getTasksJson() };
   }
 
   isTaskPresent(taskId) {
@@ -151,6 +155,9 @@ class Todos {
     return this.todos;
   }
 
+  getTodosJson() {
+    return this.todos.map(todo => todo.getTodo());
+  }
   getTodosDetails() {
     return this.todos.map(todo => todo.getDetails());
   }
@@ -249,6 +256,16 @@ class User {
     return this.todos.getTodos();
   }
 
+  getTodosJson() {
+    return this.todos.getTodosJson();
+  }
+
+  getUser() {
+    const details = this.getUserDetails();
+    const todos = this.getTodosJson();
+    return { details, todos };
+  }
+
   getTodosDetails() {
     return this.todos.getTodosDetails();
   }
@@ -321,6 +338,12 @@ class UserDetail {
   getId() {
     return this.id;
   }
+  getDetails() {
+    const id = this.id;
+    const name = this.name;
+    const password = this.password;
+    return { id, name, password };
+  }
 }
 
 class Users {
@@ -340,7 +363,10 @@ class Users {
     return this.users.some(user => user.isSameId(userId));
   }
   validateUser(userId, password) {
-    return this.users.some(user => user.isSameId(userId, password));
+    return this.users.some(user => user.isSameUser(userId, password));
+  }
+  getUsersData() {
+    return this.users.map(user => user.getUser());
   }
 }
 
