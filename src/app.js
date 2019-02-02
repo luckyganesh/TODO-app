@@ -165,7 +165,7 @@ const userHandler = function (fs, cookies, users, req, res, next) {
     req.url = '/' + req.url.split('/').slice(2).join('/');
     req.user = users.getUser(userId);
     todoApp(req, res);
-    updateUsersDataFile(fs, users);
+    if (req.isChange) updateUsersDataFile(fs, users);
     return;
   }
   next();

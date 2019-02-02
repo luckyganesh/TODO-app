@@ -30,6 +30,7 @@ const sendTodos = function (req, res) {
 const deleteTodo = function (req, res) {
   let { todoId } = JSON.parse(req.body);
   req.user.deleteTodo(todoId);
+  userDataChange(req);
   res.end();
 }
 
@@ -44,6 +45,7 @@ const addTodo = function (req, res) {
   const todo = createNewTodo(todoDetails);
   req.user.addTodo(todo);
   res.end();
+  userDataChange(req)
   return;
 }
 
@@ -86,6 +88,7 @@ const addTask = function (req, res) {
   const { taskContent } = JSON.parse(req.body);
   const task = createNewTask(taskContent);
   req.user.addTaskToTodo(todoId, task);
+  userDataChange(req);
   res.end();
   return;
 }
@@ -108,6 +111,7 @@ const toggleTaskStatus = function (req, res) {
   const todoId = getTodoId(req.url);
   const { taskId } = JSON.parse(req.body);
   req.user.toggleTodoTaskStatus(todoId, taskId);
+  userDataChange(req);
   res.end();
   return;
 }
@@ -117,6 +121,7 @@ const deleteTask = function (req, res) {
   const { taskId } = JSON.parse(req.body);
   req.user.deleteTaskInTodo(todoId, taskId);
   res.end();
+  userDataChange(req);
   return;
 }
 
@@ -125,6 +130,7 @@ const modifyTodoDetails = function (req, res) {
   const details = JSON.parse(req.body);
   req.user.modifyTodoDetails(todoId, details);
   res.end();
+  userDataChange(req);
   return;
 }
 
@@ -133,6 +139,7 @@ const modifyTaskContent = function (req, res) {
   const { taskId, taskContent } = JSON.parse(req.body);
   req.user.modifyTodoTaskContent(todoId, taskId, taskContent);
   res.end();
+  userDataChange(req);
   return;
 }
 
@@ -144,12 +151,16 @@ const checkValidTodo = function (req, res, next) {
   return;
 }
 
+const userDataChange = function (req) {
+  req.isChange = true;
+}
+
 app.use(renderTodoDetail);
 app.get('/', renderTodosPage);
 app.post('/todos', sendTodos);
+app.post('/getTodo', sendTodoList);
 app.post('/addTodo', addTodo);
 app.post('/deleteTodo', deleteTodo);
-app.post('/getTodo', sendTodoList);
 app.use(checkValidTodo);
 app.post(/\/.*\/getTasks/, getTasks);
 app.post(/\/.*\/getDetails/, getDetails);
