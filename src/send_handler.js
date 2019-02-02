@@ -1,5 +1,6 @@
 const send = function (res, statusCode, message, contentType) {
-  res.contentType = contentType;
+  contentType && res.setHeader('Content-Type', contentType);
+  //res.contentType = contentType;
   res.statusCode = statusCode;
   res.write(message);
   res.end();
