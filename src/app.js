@@ -4,7 +4,7 @@ const { UTILS, SEND_HANDLER, RENDER_PAGES, READ_OPTIONS, EXPRESS,
   ENTITIES, COOKIES, COOKIES_FILE, ENCODING, USERS_DATA
 } = require("./constants.js");
 
-const { logRequest } = require(UTILS);
+const { logRequest, redirect } = require(UTILS);
 const { renderHomePage, renderFiles, renderLoginPage } = require(RENDER_PAGES);
 const { readBody, readCookies, readArgs } = require(READ_OPTIONS);
 const { send } = require(SEND_HANDLER);
@@ -31,11 +31,6 @@ const writeFile = function (fs, fileName, data) {
 
 const setCookie = function (res, cookieData) {
   res.setHeader('Set-Cookie', cookieData);
-}
-
-const redirect = function (res, location) {
-  res.writeHead(302, { Location: location });
-  res.end();
 }
 
 const readTaskData = function (taskData) {
@@ -174,7 +169,7 @@ const logoutHandler = function (fs, cookies, req, res) {
   redirect(res, '/login');
 }
 
-// app.use(logRequest);
+app.use(logRequest);
 app.use(readBody);
 app.use(readCookies);
 app.use(userHandler.bind(null, fs, cookies, users));
