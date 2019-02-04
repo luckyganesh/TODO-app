@@ -8,7 +8,7 @@ const { logRequest } = require(UTILS);
 const { renderHomePage, renderFiles, renderLoginPage } = require(RENDER_PAGES);
 const { readBody, readCookies, readArgs } = require(READ_OPTIONS);
 
-const { Express } = require(EXPRESS);
+//const { Express } = require('express');//require(EXPRESS);
 const todoApp = require('./todoApp.js');
 
 const { Task,
@@ -21,8 +21,8 @@ const { Task,
 } = require(ENTITIES);
 
 const { Cookie, Cookies } = require(COOKIES);
-
-const app = new Express();
+const express = require('express');
+const app = express();
 
 const writeFile = function (fs, fileName, data) {
   fs.writeFile(fileName, data, () => { });
@@ -188,6 +188,6 @@ app.get('/login', renderLoginPage.bind(null, fs, cookies));
 app.get('/', renderHomePage.bind(null, cookies));
 app.post('/createNewUser', createUserHandler.bind(null, fs, users));
 app.get('/logout', logoutHandler.bind(null, fs, cookies));
-app.use(renderFiles.bind(null, fs));
+app.use(express.static('public'));
 
-module.exports = app.requestHandler.bind(app);
+module.exports = app;//.requestHandler.bind(app);

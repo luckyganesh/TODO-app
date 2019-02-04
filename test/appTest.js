@@ -15,7 +15,7 @@ describe('app', () => {
       request(app)
         .get('/main.css')
         .expect(200)
-        .expect('Content-Type', 'text/css')
+        .expect('Content-Type', /text\/css/)
         .expect(/html,body{/)
         .end(done);
     })

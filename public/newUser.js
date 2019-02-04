@@ -12,13 +12,16 @@ const addUser = function () {
   }).then(res => {
     return res.json();
   }).then(data => {
+    let message = document.getElementById('message');
     if (data.status == 1) {
-      document.getElementById('error').style.visibility = 'visible';
+      message.innerText = 'sorry already existing user id';
+      message.className = 'red';
       form.id.value = "";
       return;
     }
     form.reset();
-    document.getElementById('error').style.visibility = 'hidden';
+    message.innerText = 'Your Account Created Successfully';
+    message.className = 'green';
     return;
   })
 }
