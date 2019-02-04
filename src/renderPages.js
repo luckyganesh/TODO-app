@@ -34,8 +34,9 @@ const renderFiles = function (fs, req, res) {
 const renderLoginPage = function (fs, cookies, req, res) {
   const id = +req.cookies.id;
   if (id && cookies.isIdPresent(id)) {
+    let userId = cookies.giveMeUser(id).userId;
     res.writeHead(302, {
-      Location: '/'
+      Location: '/' + userId
     });
     res.end();
     return;

@@ -7,6 +7,7 @@ const { UTILS, SEND_HANDLER, RENDER_PAGES, READ_OPTIONS, EXPRESS,
 const { logRequest } = require(UTILS);
 const { renderHomePage, renderFiles, renderLoginPage } = require(RENDER_PAGES);
 const { readBody, readCookies, readArgs } = require(READ_OPTIONS);
+const { send } = require(SEND_HANDLER);
 
 //const { Express } = require('express');//require(EXPRESS);
 const todoApp = require('./todoApp.js');
@@ -82,10 +83,10 @@ const readUsersData = function (usersData) {
 }
 
 const readUsersFile = function (fs) {
-  if (!fs.existsSync('./users.json')) {
+  if (!fs.existsSync(USERS_DATA)) {
     fs.writeFileSync('./users.json', '[]');
   }
-  const usersData = fs.readFileSync('./users.json', 'utf8');
+  const usersData = fs.readFileSync(USERS_DATA, 'utf8');
   return readUsersData(JSON.parse(usersData));
 }
 
@@ -113,7 +114,7 @@ const users = readUsersFile(fs)
 
 const updateUsersDataFile = function (fs, users) {
   const usersData = JSON.stringify(users.getUsersData());
-  writeFile(fs, './users.json', usersData);
+  writeFile(fs, USERS_DATA, usersData);
 }
 
 const createNewUser = function (userData) {
@@ -125,13 +126,9 @@ const createNewUser = function (userData) {
 const createUserHandler = function (fs, users, req, res) {
   let userData = JSON.parse(req.body);
   const { id } = userData;
-  if (users.isAlreadyPresent(id)) {
-    res.write(JSON.stringify({ status: 1 }))
-    res.end();
-    return;
-  }
-  res.write(JSON.stringify({ status: 0 }))
-  res.end();
+  const isValid = users.isAlreadyPresent(id);
+  send(res, 200, JSON.stringify({ status: +isValid }), 'application/json');
+  if (isValid) return;
   const user = createNewUser(userData);
   users.addUser(user);
   updateUsersDataFile(fs, users);
@@ -154,8 +151,7 @@ const provideCookie = function (fs, cookies, req, res) {
 const loginHandler = function (allusers, req, res) {
   const { id, password } = JSON.parse(req.body);
   const status = +allusers.validateUser(id, password);
-  res.write(JSON.stringify({ status }));
-  res.end();
+  send(res, 200, JSON.stringify({ status }), 'application/json');
 }
 
 const userHandler = function (fs, cookies, users, req, res, next) {
@@ -178,11 +174,11 @@ const logoutHandler = function (fs, cookies, req, res) {
   redirect(res, '/login');
 }
 
-app.use(logRequest);
+// app.use(logRequest);
 app.use(readBody);
 app.use(readCookies);
 app.use(userHandler.bind(null, fs, cookies, users));
-app.post('/getCookie', provideCookie.bind(null, fs, cookies));
+app.post('/cookie', provideCookie.bind(null, fs, cookies));
 app.post('/login', loginHandler.bind(null, users));
 app.get('/login', renderLoginPage.bind(null, fs, cookies));
 app.get('/', renderHomePage.bind(null, cookies));

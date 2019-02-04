@@ -5,9 +5,9 @@ const READ_OPTIONS = './readOptions.js';
 const EXPRESS = './express.js';
 const ENTITIES = './entities.js'
 const COOKIES = './cookies.js';
-const COOKIES_FILE = './src/cookies.json';
+const COOKIES_FILE = './private/cookies.json';
 const ENCODING = "utf8";
-const USERS_DATA = "./users";
+const USERS_DATA = "./private/users.json";
 
 const MIME_TEXT_PLAIN = 'text/plain';
 const MIME_TYPES = {

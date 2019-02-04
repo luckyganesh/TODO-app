@@ -17,7 +17,7 @@ const verifyUser = function () {
     }
     form.onsubmit = null;
     form.method = "POST";
-    form.action = "/getCookie";
+    form.action = "/cookie";
     form.submit();
     return;
   })
