@@ -79,7 +79,7 @@ const readUsersData = function (usersData) {
 
 const readUsersFile = function (fs) {
   if (!fs.existsSync(USERS_DATA)) {
-    fs.writeFileSync('./users.json', '[]');
+    fs.writeFileSync(USERS_DATA, '[]');
   }
   const usersData = fs.readFileSync(USERS_DATA, 'utf8');
   return readUsersData(JSON.parse(usersData));
