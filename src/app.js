@@ -103,6 +103,13 @@ const readCookiesFile = function (fs) {
   return createCookiesCache(cookiesData);
 }
 
+const createPrivateDir = function () {
+  if (!fs.existsSync('./private')) {
+    fs.mkdirSync('./private');
+  }
+}
+
+createPrivateDir();
 const cookies = readCookiesFile(fs);
 
 const users = readUsersFile(fs)
